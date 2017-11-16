@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Encontre Tesouro</title>
+<script src="../agejs.js" charset="utf-8"></script>
+<script>
+
+	var engine = AgeJS.getInstance();
+		
+	var tiles = [
+		{
+			type:"terrain",
+			name:"ground",
+			referenceId:0,
+			fileName:"ground.png",
+			passable:1
+		},
+		{
+			type:"building",
+			name:"wall",
+			referenceId:1,
+			fileName:"wall.png",
+			passable:0,
+			pixelWidth:64,
+			pixelHeight:64,
+			tileWidth:1,
+			tileHeight:1,
+			passableGrid:[
+				[0]
+			],
+			frames:[0]
+		},
+		{
+			type:"building",
+			referenceId:2,
+			name:"clock",
+			fileName:"clock.png",
+			pixelWidth:128,
+			pixelHeight:243,
+			tileWidth:2,
+			tileHeight:2,
+			passableGrid:[
+				[0,0],
+				[0,0]
+			],
+			frames:[0]
+		},
+		{
+			type:"building",
+			referenceId:3,
+			name:"clock-mirror",
+			fileName:"clock-mirror.png",
+			pixelWidth:128,
+			pixelHeight:243,
+			tileWidth:2,
+			tileHeight:2,
+			passableGrid:[
+				[0,0],
+				[0,0]
+			],
+			frames:[0]
+		},{
+			type:"building",
+			name:"tree",
+			referenceId:4,
+			fileName:"tree.png",
+			pixelWidth:128,
+			pixelHeight:110,
+			tileWidth:1,
+			tileHeight:1,
+			passableGrid:[
+				[0]
+			],
+			frames:[0]
+		}		
+	];	
+	
+	var tileMap = [
+					[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+					[1,1,1,0,0,0,0,0,0,1,1,1,1,4,4,4,1,1,1,1,0,0,0,0,0,0,0,4,1,4,4,1],
+					[1,1,2,0,0,0,0,0,0,1,1,1,1,1,4,4,1,0,0,0,0,0,0,0,0,0,0,0,1,4,4,1],
+					[1,0,0,0,0,0,1,0,0,0,0,0,0,1,4,4,1,0,0,0,0,0,1,1,1,1,1,1,1,4,4,1],
+					[1,0,0,0,0,0,1,0,0,0,0,0,0,1,4,1,1,0,0,0,1,1,1,4,4,4,4,4,4,4,4,1],
+					[1,1,0,0,1,1,1,1,1,1,1,0,0,1,4,4,1,1,1,1,4,4,4,4,4,4,4,4,4,4,4,1],
+					[1,1,0,0,1,1,1,1,1,1,1,0,0,1,4,4,4,4,4,4,1,1,1,1,1,1,1,4,4,4,4,1],
+					[1,1,0,0,1,0,0,0,0,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,4,4,4,4,1],
+					[1,1,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,2,0,0,0,0,1,4,4,4,4,1],
+					[1,1,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,4,4,4,4,1],
+					[1,1,0,0,1,1,0,0,1,1,1,0,0,1,1,1,1,0,0,1,0,0,0,0,0,1,1,4,4,4,4,1],
+					[1,1,0,0,1,1,0,0,1,4,1,0,0,1,4,4,1,0,0,1,1,1,1,0,0,1,1,1,1,1,4,1],
+					[1,1,0,0,1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,4,1],
+					[1,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,1,4,1],
+					[1,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,0,1,1,0,0,1,4,1],
+					[1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,4,1],
+					[1,1,0,0,1,1,1,1,1,0,0,1,4,4,4,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,4,1],
+					[1,1,0,0,1,1,1,0,0,0,0,1,4,4,4,1,0,0,1,1,1,1,1,1,1,1,1,0,0,1,4,1],
+					[1,1,0,0,1,1,0,0,0,0,0,1,4,4,4,1,0,0,0,0,0,0,0,0,0,1,1,0,0,1,4,1],
+					[1,1,0,0,1,1,0,0,0,1,1,1,1,4,4,1,0,0,0,0,0,0,0,0,0,1,1,0,0,1,4,1],
+					[1,1,0,0,1,1,0,0,0,1,4,4,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,1,4,1],
+					[1,1,0,0,1,1,1,0,0,1,4,4,4,4,4,4,4,4,4,4,4,1,1,0,0,1,1,0,0,1,4,1],
+					[1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,4,1],
+					[1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,4,1],
+					[1,1,0,0,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,1,4,1],
+					[1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1],
+					[1,1,0,0,1,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,4,4,4,4,4,1,0,0,0,1],
+					[1,1,0,0,1,1,1,0,0,1,1,4,4,4,4,4,4,1,0,0,1,1,1,4,4,0,4,1,0,0,0,1],
+					[1,1,0,0,0,0,0,0,0,1,1,4,4,4,4,4,4,1,0,0,0,0,1,1,1,1,1,1,0,0,0,1],
+					[1,1,0,0,0,0,0,0,0,1,1,4,4,4,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+					[1,1,1,1,1,1,1,1,1,1,1,1,4,4,4,4,4,1,0,0,0,0,0,0,0,0,0,0,0,1,4,1],
+					[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+				];
+	var mapa = new Map(tileMap, tiles, 64, 32);
+	var endgame = false;	
+		
+	var troll = new EntityObject(980, 230, 38, 96, 42);
+	troll.sprite = new Sprite('troll.png', 128, 128);
+	troll.sprite.animateStrategy = new TimeBased(100);
+	troll.sprite.direction = 7;
+	troll.addState('IDLE', [0, 1, 2, 3]);
+	troll.addState('WALKING', [4, 5, 6, 7, 8, 9, 10, 11]);
+	troll.setStartingState('IDLE');
+	troll.addSound('WALKING', 'footsteps');
+	troll.speed = 1;
+	troll.score = 0;	
+	
+	// define o controle do personagem
+	troll.addEventListener(Event.ENTER_FRAME, function(timeElapsed) {		
+		
+		var keyboard = AgeJS.getInstance().getKeyboard();
+		
+		if (endgame) {
+			this.setNextState('IDLE');	
+			this.pauseSound('WALKING');			
+			if (keyboard.keyDown(Keys.RETURN)) engine.setNextScene('CREDITOS')
+		} else {
+		
+			var walking = false;
+		
+			if (keyboard.keyDown(Keys.LEFT)) {
+				walking = true;
+				this.sprite.direction = 0;				
+				if (mapa.hitTest(this, -this.speed, 0))
+					this.x -= this.speed;
+			}
+			
+			if (keyboard.keyDown(Keys.UP)) {
+				walking = true;
+				this.sprite.direction = 2;				
+				if (mapa.hitTest(this, 0, -this.speed))
+					this.y -= this.speed;
+			}
+			
+			if (keyboard.keyDown(Keys.LEFT) && keyboard.keyDown(Keys.UP)) this.sprite.direction = 1;
+				
+			if (keyboard.keyDown(Keys.RIGHT)) {
+				walking = true;
+				this.sprite.direction = 4;			
+				if (mapa.hitTest(this, this.speed, 0))
+					this.x += this.speed;
+			}	
+			
+			if (keyboard.keyDown(Keys.UP) && keyboard.keyDown(Keys.RIGHT)) this.sprite.direction = 3;
+		
+			if (keyboard.keyDown(Keys.DOWN)) {
+				walking = true;
+				this.sprite.direction = 6;			
+				if (mapa.hitTest(this, 0, this.speed))
+					this.y += this.speed;
+			}
+			
+			if (keyboard.keyDown(Keys.DOWN) && keyboard.keyDown(Keys.RIGHT)) this.sprite.direction = 5;
+			if (keyboard.keyDown(Keys.DOWN) && keyboard.keyDown(Keys.LEFT)) this.sprite.direction = 7;
+				
+			if (keyboard.keyDown(Keys.SPACE))
+				if (mapa.scroll.follow) mapa.scroll.follow = null;
+				else mapa.scroll.follow = this;		
+	
+			if (walking) {
+				this.setNextState('WALKING');
+				this.playSound('WALKING');
+			} else {			
+				this.setNextState('IDLE');
+				this.pauseSound('WALKING');
+			}
+		}
+	});
+	
+	// verifica a colisão com os itens
+	troll.addEventListener(Event.ON_COLLISION, function(collisions) {		
+		if (!endgame) {
+			for(var i = 0; i <= collisions.length-1; i++) {			
+				var collision = collisions[i];			
+				this.score += collision.value;
+				collision.playSound('collected');
+				pontuacao.text = "Pontuação: " + this.score;
+				if (collision instanceof Chest) {
+					endgame = true;
+					var gameover = new Label('Fim do Jogo!');
+					gameover.font = 'verdana';
+					gameover.size = 60;
+					gameover.color = 'blue';
+					var canvas = engine.getCanvas();
+					gameover.x = canvas.width/2 - 200;
+					gameover.y = canvas.height/2 - 10;
+					engine.rootScene.addChild(gameover);
+				} else engine.rootScene.removeChild(collision);
+			}
+		}
+				
+	});	
+
+	// cria um construtor para o crystal
+	function CrystalBlue(x, y) {
+		EntityObject.call(this, x, y, 10, 16, 0);
+		this.sprite = new Sprite('crystal-blue.png', 16, 16);
+		this.sprite.frames = [0, 1, 2, 3, 4, 5, 6, 7];
+		this.sprite.animateStrategy = new TimeBased(50);
+		this.value = 5;
+		this.addSound('collected', 'badadadink');
+	}
+	CrystalBlue.prototype = Object.create(EntityObject.prototype);
+	
+	// construtor para o baú
+	function Chest(x, y) {
+		EntityObject.call(this, x, y, 64, 56, 0);
+		this.sprite = new Sprite('chest.png', 64, 56);				
+		this.value = 100;
+		this.addSound('collected', 'badadadink');
+	}
+	Chest.prototype = Object.create(EntityObject.prototype);
+		
+	var pontuacao = new Label("Pontuação: 0", 20, 40);
+	pontuacao.font = 'verdana';
+	pontuacao.size = 22;
+	pontuacao.color = 'yellow';
+	
+	var chest = new Chest(1527, 511, 64, 56, 0);
+	
+	engine.rootScene.bgColor = 'black';
+	engine.rootScene.bgSoundFileName = 'music';
+	engine.rootScene.map = mapa;	
+	engine.rootScene.addChild(troll);
+	
+	// adiciona os cristais
+	engine.rootScene.addChild(new CrystalBlue(840, 400));
+	engine.rootScene.addChild(new CrystalBlue(820, 330));
+	engine.rootScene.addChild(new CrystalBlue(1634, 352));
+	engine.rootScene.addChild(new CrystalBlue(1672, 370));
+	engine.rootScene.addChild(new CrystalBlue(1710, 388));
+	engine.rootScene.addChild(new CrystalBlue(1748, 406));
+	engine.rootScene.addChild(new CrystalBlue(1776, 424));
+	
+	engine.rootScene.addChild(chest);
+	engine.rootScene.addChild(pontuacao);
+	
+	engine.enableShowFPS();
+	
+	// cria a cena de créditos e adiciona na engine
+	var creditos = new Scene();
+	creditos.bgColor = 'green';
+	
+	var titulo = new Label('CRÉDITOS');	
+	var canvas = engine.getCanvas();
+	titulo.x = canvas.width/2 - 50;
+	titulo.y = 100;
+	titulo.font = 'verdana';
+	titulo.size = 40;
+	titulo.color = 'blue';
+	creditos.addChild(titulo);
+	
+	// define um construtor para criar o texto formatado para o crédito
+	function LbCredito(x, y, texto) {
+		Label.call(this, texto);
+		this.x = x;
+		this.y = y;
+		this.font = 'verdana';
+		this.color = 'blue';
+		this.size = 20;
+	}
+	LbCredito.prototype = Object.create(Label.prototype);
+	
+	// adiciona os textos na scena
+	creditos.addChild(new LbCredito(30, 150, 'Desenvolvedor: Luiz Carlos Minosso (linklcm@gmail.com)'));
+	creditos.addChild(new LbCredito(30, 200, 'Sprite dos Cenários: SketchyLogic (https://opengameart.org/content/isometric-medieval-city-sim-assets)'));
+	creditos.addChild(new LbCredito(30, 250, 'Sprite do Personagem: VWolfdog (https://opengameart.org/content/flare-model-troll)'));	
+	creditos.addChild(new LbCredito(30, 300, 'Música e efeitos sonoro: SketchyLogic (https://opengameart.org/content/isometric-medieval-city-sim-assets)'));
+	engine.addScene('CREDITOS', creditos);
+	
+	function init() {
+		engine.run();
+	}
+</script>
+</head>
+<body onload='init()' oncontextmenu="return false;">
+</body>
+</html>
