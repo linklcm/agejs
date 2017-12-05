@@ -488,15 +488,17 @@ function Scene() {
 	this.map = null;
 	
 	this.addChild = function(child) {
-		if (child instanceof GameObject) {
+		if (child instanceof GameObject) {			
 			children.push(child);			
 		} else {
 			throw new Error('Only accepts GameObject object');
 		}
 	}
 	
-	this.removeChild = function(child) {
-		return children.pop(child);
+	this.removeChild = function(child) {				
+		for (var i = 0; i < children.length; i++)
+			if (children[i].instanceId == child.instanceId)
+				children.splice(i, 1);
 	}
 	
 	this.getChildren = function(child) {
